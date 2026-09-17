@@ -1,1 +1,574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Games Hub</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#141e30,#243b55);
+  color:white;
+}
+header{text-align:center;padding:35px 15px}
+header h1{font-size:42px;margin:0 0 10px}
+header p{color:#ccc}
+.menu{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+.menu button{
+  padding:18px;
+  border:0;
+  border-radius:15px;
+  background:#ffffff15;
+  color:white;
+  cursor:pointer;
+  font-size:16px;
+  transition:.2s;
+}
+.menu button:hover{background:#00c6ff55;transform:translateY(-3px)}
+.game{
+  display:none;
+  max-width:700px;
+  min-height:400px;
+  margin:20px auto 50px;
+  padding:30px;
+  background:#00000045;
+  border-radius:20px;
+  text-align:center;
+}
+.game.active{display:block}
+input,select{
+  padding:12px;
+  border-radius:8px;
+  border:0;
+  margin:7px;
+}
+.action{
+  padding:12px 20px;
+  border:0;
+  border-radius:10px;
+  background:#00c6ff;
+  color:white;
+  cursor:pointer;
+  margin:5px;
+  font-weight:bold;
+}
+.result{font-size:20px;margin:20px}
+.board{
+  display:grid;
+  grid-template-columns:repeat(3,90px);
+  justify-content:center;
+}
+.cell{
+  width:90px;height:90px;
+  border:2px solid white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:40px;
+  cursor:pointer;
+}
+.memory{
+  display:grid;
+  grid-template-columns:repeat(4,70px);
+  gap:10px;
+  justify-content:center;
+}
+.card{
+  width:70px;height:70px;
+  background:#34495e;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  border-radius:10px;
+  cursor:pointer;
+}
+#clickArea{
+  height:220px;
+  background:#333;
+  border-radius:15px;
+  position:relative;
+  cursor:pointer;
+}
+#target{
+  position:absolute;
+  width:45px;height:45px;
+  background:#ff4757;
+  border-radius:50%;
+  display:none;
+}
+#snakeCanvas{
+  background:#111;
+  border:2px solid white;
+  max-width:100%;
+}
+.colorBox{
+  width:180px;height:180px;
+  margin:20px auto;
+  border-radius:20px;
+}
+#catchBox{
+  width:60px;height:60px;
+  background:#2ed573;
+  position:absolute;
+  display:none;
+}
+.catchArea{
+  height:250px;
+  position:relative;
+  background:#222;
+  border-radius:15px;
+}
+.simons{
+  display:grid;
+  grid-template-columns:repeat(2,120px);
+  gap:10px;
+  justify-content:center;
+}
+.simon{
+  height:120px;
+  opacity:.65;
+  cursor:pointer;
+  border-radius:15px;
+}
+.green{background:#2ed573}
+.red{background:#ff4757}
+.blue{background:#1e90ff}
+.yellow{background:#ffa502}
+.flash{opacity:1;box-shadow:0 0 30px white}
+</style>
+</head>
 
+<body>
+
+<header>
+<h1>🎮 Mini Games Hub</h1>
+<p>10 mini games dalam satu website</p>
+</header>
+
+<div class="menu">
+<button onclick="showGame('number')">🔢 Tebak Angka</button>
+<button onclick="showGame('rps')">✊ Batu Gunting Kertas</button>
+<button onclick="showGame('ttt')">⭕ Tic-Tac-Toe</button>
+<button onclick="showGame('memory')">🧠 Memory Card</button>
+<button onclick="showGame('click')">⚡ Klik Cepat</button>
+<button onclick="showGame('math')">➗ Math Quiz</button>
+<button onclick="showGame('color')">🎨 Tebak Warna</button>
+<button onclick="showGame('snake')">🐍 Snake</button>
+<button onclick="showGame('catch')">🎯 Catch the Box</button>
+<button onclick="showGame('simon')">🔴 Simon Says</button>
+</div>
+
+<!-- 1 -->
+<section id="number" class="game">
+<h2>🔢 Tebak Angka</h2>
+<p>Tebak angka 1–100.</p>
+<input id="guess" type="number">
+<button class="action" onclick="checkGuess()">Tebak</button>
+<div id="guessResult" class="result"></div>
+</section>
+
+<!-- 2 -->
+<section id="rps" class="game">
+<h2>✊ Batu Gunting Kertas</h2>
+<button class="action" onclick="rps('Batu')">✊ Batu</button>
+<button class="action" onclick="rps('Gunting')">✌️ Gunting</button>
+<button class="action" onclick="rps('Kertas')">✋ Kertas</button>
+<div id="rpsResult" class="result"></div>
+</section>
+
+<!-- 3 -->
+<section id="ttt" class="game">
+<h2>⭕ Tic-Tac-Toe</h2>
+<div id="board" class="board"></div>
+<div id="tttResult" class="result"></div>
+<button class="action" onclick="resetTTT()">Reset</button>
+</section>
+
+<!-- 4 -->
+<section id="memory" class="game">
+<h2>🧠 Memory Card</h2>
+<div id="memoryBoard" class="memory"></div>
+<div id="memoryResult"></div>
+<button class="action" onclick="startMemory()">Mulai Ulang</button>
+</section>
+
+<!-- 5 -->
+<section id="click" class="game">
+<h2>⚡ Klik Secepat Mungkin</h2>
+<p>Waktu: <span id="timer">10</span> detik</p>
+<p>Skor: <span id="clickScore">0</span></p>
+<button class="action" onclick="startClick()">Mulai</button>
+<div id="clickArea" onclick="clickGame()"></div>
+</section>
+
+<!-- 6 -->
+<section id="math" class="game">
+<h2>➗ Math Quiz</h2>
+<h3 id="question"></h3>
+<input id="answer" type="number">
+<button class="action" onclick="checkMath()">Jawab</button>
+<div id="mathResult"></div>
+</section>
+
+<!-- 7 -->
+<section id="color" class="game">
+<h2>🎨 Tebak Warna</h2>
+<div id="colorBox" class="colorBox"></div>
+<p>Warna apakah ini?</p>
+<div id="colorChoices"></div>
+<div id="colorResult"></div>
+</section>
+
+<!-- 8 -->
+<section id="snake" class="game">
+<h2>🐍 Snake</h2>
+<p>Gunakan tombol panah keyboard.</p>
+<canvas id="snakeCanvas" width="400" height="400"></canvas>
+<br>
+<button class="action" onclick="startSnake()">Mulai Snake</button>
+<div id="snakeScore">Skor: 0</div>
+</section>
+
+<!-- 9 -->
+<section id="catch" class="game">
+<h2>🎯 Catch the Box</h2>
+<p>Klik kotak hijau sebanyak mungkin!</p>
+<p>Skor: <span id="catchScore">0</span></p>
+<div class="catchArea" id="catchArea">
+<div id="catchBox"></div>
+</div>
+<button class="action" onclick="startCatch()">Mulai</button>
+</section>
+
+<!-- 10 -->
+<section id="simon" class="game">
+<h2>🔴 Simon Says</h2>
+<p>Ingat urutan warna.</p>
+<div class="simons">
+<div class="simon green" onclick="simonClick(0)"></div>
+<div class="simon red" onclick="simonClick(1)"></div>
+<div class="simon blue" onclick="simonClick(2)"></div>
+<div class="simon yellow" onclick="simonClick(3)"></div>
+</div>
+<br>
+<button class="action" onclick="startSimon()">Mulai</button>
+<div id="simonResult"></div>
+</section>
+
+<script>
+function showGame(id){
+ document.querySelectorAll('.game').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+}
+
+/* 1. TEBAK ANGKA */
+let secret=Math.floor(Math.random()*100)+1;
+function checkGuess(){
+ let g=Number(document.getElementById('guess').value);
+ let r=document.getElementById('guessResult');
+ if(g===secret){
+   r.innerHTML="🎉 Benar! Angkanya "+secret;
+   secret=Math.floor(Math.random()*100)+1;
+ }else if(g<secret) r.innerHTML="⬆️ Terlalu kecil!";
+ else r.innerHTML="⬇️ Terlalu besar!";
+}
+
+/* 2. RPS */
+function rps(player){
+ const choices=["Batu","Gunting","Kertas"];
+ const bot=choices[Math.floor(Math.random()*3)];
+ let result;
+ if(player===bot) result="Seri!";
+ else if(
+   (player==="Batu"&&bot==="Gunting")||
+   (player==="Gunting"&&bot==="Kertas")||
+   (player==="Kertas"&&bot==="Batu")
+ ) result="🎉 Kamu menang!";
+ else result="😅 Kamu kalah!";
+ document.getElementById("rpsResult").innerHTML=
+ `Kamu: ${player}<br>Bot: ${bot}<br><b>${result}</b>`;
+}
+
+/* 3. TIC TAC TOE */
+let cells=Array(9).fill("");
+let turn="X";
+function drawTTT(){
+ const board=document.getElementById("board");
+ board.innerHTML="";
+ cells.forEach((v,i)=>{
+   let d=document.createElement("div");
+   d.className="cell";
+   d.textContent=v;
+   d.onclick=()=>moveTTT(i);
+   board.appendChild(d);
+ });
+}
+function moveTTT(i){
+ if(cells[i])return;
+ cells[i]=turn;
+ if(checkWin(turn)){
+   document.getElementById("tttResult").textContent=turn+" menang! 🎉";
+   return;
+ }
+ if(!cells.includes("")){
+   document.getElementById("tttResult").textContent="Seri!";
+   return;
+ }
+ turn=turn==="X"?"O":"X";
+ drawTTT();
+}
+function checkWin(p){
+ return [
+ [0,1,2],[3,4,5],[6,7,8],
+ [0,3,6],[1,4,7],[2,5,8],
+ [0,4,8],[2,4,6]
+ ].some(a=>a.every(i=>cells[i]===p));
+}
+function resetTTT(){
+ cells=Array(9).fill("");
+ turn="X";
+ document.getElementById("tttResult").textContent="";
+ drawTTT();
+}
+drawTTT();
+
+/* 4. MEMORY */
+let emojis=["🍎","🍎","🍕","🍕","🚗","🚗","🐶","🐶",
+"⚽","⚽","🚀","🚀","🌟","🌟","🎮","🎮"];
+let opened=[],matched=0;
+function startMemory(){
+ let arr=[...emojis].sort(()=>Math.random()-.5);
+ opened=[];matched=0;
+ const board=document.getElementById("memoryBoard");
+ board.innerHTML="";
+ arr.forEach((e,i)=>{
+   let c=document.createElement("div");
+   c.className="card";
+   c.textContent="❓";
+   c.onclick=()=>{
+     if(opened.length>=2||c.dataset.open==="1")return;
+     c.textContent=e;
+     c.dataset.open="1";
+     opened.push({c,e});
+     if(opened.length===2){
+       if(opened[0].e===opened[1].e){
+         matched++;
+         opened=[];
+         if(matched===8)
+           document.getElementById("memoryResult").textContent="🎉 Semua pasangan ditemukan!";
+       }else{
+         setTimeout(()=>{
+           opened.forEach(x=>{
+             x.c.textContent="❓";
+             x.c.dataset.open="";
+           });
+           opened=[];
+         },700);
+       }
+     }
+   };
+   board.appendChild(c);
+ });
+}
+startMemory();
+
+/* 5. CLICK */
+let clickScore=0,clickTime=10,clickRunning=false;
+function startClick(){
+ clickScore=0;clickTime=10;clickRunning=true;
+ document.getElementById("clickScore").textContent=0;
+ document.getElementById("timer").textContent=10;
+ moveTarget();
+ let t=setInterval(()=>{
+   clickTime--;
+   document.getElementById("timer").textContent=clickTime;
+   if(clickTime<=0){
+     clearInterval(t);
+     clickRunning=false;
+     alert("Waktu habis! Skor: "+clickScore);
+   }
+ },1000);
+}
+function moveTarget(){
+ const area=document.getElementById("clickArea");
+ let target=document.getElementById("target");
+ if(!target){
+   target=document.createElement("div");
+   target.id="target";
+   area.appendChild(target);
+ }
+ target.style.display="block";
+ target.style.left=Math.random()*(area.clientWidth-50)+"px";
+ target.style.top=Math.random()*(area.clientHeight-50)+"px";
+}
+function clickGame(){
+ if(!clickRunning)return;
+ clickScore++;
+ document.getElementById("clickScore").textContent=clickScore;
+ moveTarget();
+}
+
+/* 6. MATH */
+let correctAnswer;
+function newMath(){
+ let a=Math.floor(Math.random()*20)+1;
+ let b=Math.floor(Math.random()*20)+1;
+ correctAnswer=a+b;
+ document.getElementById("question").textContent=`${a} + ${b} = ?`;
+ document.getElementById("answer").value="";
+}
+function checkMath(){
+ let a=Number(document.getElementById("answer").value);
+ document.getElementById("mathResult").textContent=
+ a===correctAnswer?"✅ Benar!":"❌ Salah!";
+ if(a===correctAnswer)newMath();
+}
+newMath();
+
+/* 7. COLOR */
+const colors=[
+ {name:"Merah",value:"#ff4757"},
+ {name:"Biru",value:"#1e90ff"},
+ {name:"Hijau",value:"#2ed573"},
+ {name:"Kuning",value:"#ffa502"},
+ {name:"Ungu",value:"#a55eea"}
+];
+function newColor(){
+ let correct=colors[Math.floor(Math.random()*colors.length)];
+ document.getElementById("colorBox").style.background=correct.value;
+ let shuffled=[...colors].sort(()=>Math.random()-.5);
+ document.getElementById("colorChoices").innerHTML="";
+ shuffled.forEach(c=>{
+   let b=document.createElement("button");
+   b.className="action";
+   b.textContent=c.name;
+   b.onclick=()=>{
+     document.getElementById("colorResult").textContent=
+       c===correct?"🎉 Benar!":"❌ Salah!";
+     if(c===correct)setTimeout(newColor,500);
+   };
+   document.getElementById("colorChoices").appendChild(b);
+ });
+}
+newColor();
+
+/* 8. SNAKE */
+const canvas=document.getElementById("snakeCanvas");
+const ctx=canvas.getContext("2d");
+let snake,food,dx,dy,snakeScore,gameLoop;
+function startSnake(){
+ snake=[{x:200,y:200}];
+ dx=20;dy=0;snakeScore=0;
+ food={
+   x:Math.floor(Math.random()*20)*20,
+   y:Math.floor(Math.random()*20)*20
+ };
+ clearInterval(gameLoop);
+ gameLoop=setInterval(drawSnake,100);
+}
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowUp"&&dy===0){dx=0;dy=-20}
+ if(e.key==="ArrowDown"&&dy===0){dx=0;dy=20}
+ if(e.key==="ArrowLeft"&&dx===0){dx=-20;dy=0}
+ if(e.key==="ArrowRight"&&dx===0){dx=20;dy=0}
+});
+function drawSnake(){
+ ctx.fillStyle="#111";ctx.fillRect(0,0,400,400);
+ let head={x:snake[0].x+dx,y:snake[0].y+dy};
+ if(head.x<0||head.x>=400||head.y<0||head.y>=400||
+    snake.some(s=>s.x===head.x&&s.y===head.y)){
+   clearInterval(gameLoop);
+   alert("Game Over! Skor: "+snakeScore);
+   return;
+ }
+ snake.unshift(head);
+ if(head.x===food.x&&head.y===food.y){
+   snakeScore++;
+   document.getElementById("snakeScore").textContent="Skor: "+snakeScore;
+   food={
+    x:Math.floor(Math.random()*20)*20,
+    y:Math.floor(Math.random()*20)*20
+   };
+ }else snake.pop();
+ ctx.fillStyle="#2ed573";
+ snake.forEach(s=>ctx.fillRect(s.x,s.y,18,18));
+ ctx.fillStyle="#ff4757";
+ ctx.fillRect(food.x,food.y,18,18);
+}
+
+/* 9. CATCH BOX */
+let catchScore=0,catchTimer;
+function startCatch(){
+ catchScore=0;
+ document.getElementById("catchScore").textContent=0;
+ let box=document.getElementById("catchBox");
+ box.style.display="block";
+ moveCatch();
+ clearTimeout(catchTimer);
+ catchTimer=setTimeout(()=>{
+   box.style.display="none";
+   alert("Waktu habis! Skor: "+catchScore);
+ },15000);
+}
+document.getElementById("catchBox").onclick=()=>{
+ catchScore++;
+ document.getElementById("catchScore").textContent=catchScore;
+ moveCatch();
+};
+function moveCatch(){
+ let area=document.getElementById("catchArea");
+ let box=document.getElementById("catchBox");
+ box.style.left=Math.random()*(area.clientWidth-60)+"px";
+ box.style.top=Math.random()*(area.clientHeight-60)+"px";
+}
+
+/* 10. SIMON */
+let simonSequence=[],simonPlayer=[],simonLevel=0;
+const simonButtons=document.querySelectorAll(".simon");
+function startSimon(){
+ simonSequence=[];
+ simonPlayer=[];
+ simonLevel=0;
+ nextSimon();
+}
+function nextSimon(){
+ simonPlayer=[];
+ simonLevel++;
+ document.getElementById("simonResult").textContent="Level "+simonLevel;
+ simonSequence.push(Math.floor(Math.random()*4));
+ playSimon();
+}
+function playSimon(){
+ simonSequence.forEach((n,i)=>{
+   setTimeout(()=>{
+     simonButtons[n].classList.add("flash");
+     setTimeout(()=>simonButtons[n].classList.remove("flash"),300);
+   },i*600);
+ });
+}
+function simonClick(n){
+ if(simonSequence.length===0)return;
+ let index=simonPlayer.length;
+ if(n!==simonSequence[index]){
+   document.getElementById("simonResult").textContent=
+     "❌ Salah! Kamu mencapai level "+simonLevel;
+   simonSequence=[];return;
+ }
+ simonPlayer.push(n);
+ if(simonPlayer.length===simonSequence.length)
+   setTimeout(nextSimon,700);
+}
+</script>
+
+</body>
+</html>
