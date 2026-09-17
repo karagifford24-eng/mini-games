@@ -1,2 +1,0 @@
-# mini-games
-mini games
